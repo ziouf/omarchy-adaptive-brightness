@@ -704,6 +704,7 @@ Panel {
               id: brightnessRow
               width: parent.width
               height: brightnessSlider.implicitHeight + Style.spacing.controlGap
+                + (root.adaptiveOn ? Style.space(16) : 0)
               hasCursor: root.cursorActive && root.focusSection === "brightness" && root.selectedIndex === -1
               onHasCursorChanged: if (hasCursor) root.ensureCursorVisible(brightnessRow)
               foreground: root.bar.foreground

@@ -104,9 +104,12 @@ detect_cam() {
 }
 
 cam_probe() {
-  timeout 5 ffmpeg -hide_banner -loglevel error -y -f v4l2 -i "$1" \
-    -frames:v 1 -vf "scale=1x1,format=gray" -f rawvideo - 2>/dev/null |
-    grep -q .
+  # Count output bytes, never grep them: a raw gray byte >= 0x80 is invalid
+  # UTF-8 and `grep -q .` would reject a perfectly good frame.
+  local n
+  n=$(timeout 5 ffmpeg -hide_banner -loglevel error -y -f v4l2 -i "$1" \
+      -frames:v 1 -vf "scale=1x1,format=gray" -f rawvideo - 2>/dev/null | wc -c) || return 1
+  [ "$n" -ge 1 ]
 }
 
 # cam_luminance DEV -> mean gray 0..255 of one frame

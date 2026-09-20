@@ -69,8 +69,9 @@ Item {
     Behavior on width { enabled: !root.dragging; NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
   }
 
-  // Current applied brightness: thin accent bar + live percentage above it.
-  // Purely informative — no MouseArea, never intercepts slider input.
+  // Current applied brightness: thin accent bar with the live percentage
+  // anchored just above the track. Purely informative — no MouseArea, never
+  // intercepts slider input.
   Item {
     id: levelMarker
     x: Math.max(0, Math.min(track.width - width, track.width * root.frac(root.currentValue) - width / 2))
@@ -88,25 +89,17 @@ Item {
       font.pixelSize: Style.font.caption
       font.bold: true
       anchors.horizontalCenter: parent.horizontalCenter
-      anchors.top: parent.top
+      anchors.bottom: track.top
+      anchors.bottomMargin: Style.space(2)
     }
 
     Rectangle {
       width: Math.max(2, Style.space(2))
-      height: track.height + Style.space(10)
+      height: track.height + Style.space(12)
       radius: 1
       color: Color.accent
       anchors.horizontalCenter: parent.horizontalCenter
       anchors.verticalCenter: track.verticalCenter
-    }
-
-    Text {
-      textFormat: Text.PlainText
-      text: "\u25bc"
-      color: Color.accent
-      font.pixelSize: Style.font.caption
-      anchors.horizontalCenter: parent.horizontalCenter
-      anchors.top: levelText.bottom
     }
   }
 
