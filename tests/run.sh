@@ -33,7 +33,7 @@ mid=$(map_lux 70 10 90 5000)   # sqrt-ish midpoint of log curve
 # p90
 t "p90 basic" 90 "$(printf '%s\n' $(seq 1 100) | p90)"
 t "p90 one"   7  "$(printf '7\n' | p90)"
-t "p90 shadow" 100 "{ printf '0\n%.0s' $(seq 17); printf '100\n100\n100\n'; } | p90"
+t "p90 shadow" 100 "$({ printf '0\n%.0s' $(seq 17); printf '100\n100\n100\n'; } | p90)"
 
 # map_webcam (black/white point)
 t "map_webcam night"  10 "$(map_webcam 0 10 90 8 150)"    # below black -> min
