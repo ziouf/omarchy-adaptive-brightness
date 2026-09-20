@@ -421,8 +421,9 @@ Panel {
   // Only poll while the panel is open; the bar glyph tracks monitor count via
   // Quickshell.screens, and open-time refresh + Component.onCompleted cover the
   // rest. External brightness changes are reflected whenever the panel is open.
+  // 1s so the adaptive loop's backlight edits show up in near-real-time.
   Timer {
-    interval: 5000
+    interval: 1000
     running: root.opened
     repeat: true
     onTriggered: root.refresh()
