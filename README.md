@@ -60,6 +60,20 @@ history) or use `scripts/toggle` directly.
 - HDMI/DP external backlights need DDC/CI (`ddcutil`) — not covered.
 - Very dark scenes with bright objects can read bright; tune `CAM_WHITE` (raise it if too dim during the day, lower it if too bright).
 
+## Security & capabilities
+
+- Everything runs in **user scope**: `systemctl --user` on a single unit
+  (`adaptive-brightness.service`), no sudo, no root, no system units.
+- No network access at runtime. The only remote fetch is the `git clone`
+  you perform yourself when installing.
+- `install-services.sh` only copies the unit file to
+  `~/.config/systemd/user/` and runs `systemctl --user`;
+  `uninstall-services.sh` only stops, disables and removes that unit.
+- Config lives in `~/.config/adaptive-brightness.conf`. Installation never
+  touches it; it is created on first use and only rewritten when you move
+  the min/max slider (`set-range`), never by updates.
+- No secrets, no telemetry, no downloads.
+
 ## Removal
 
 ```bash
