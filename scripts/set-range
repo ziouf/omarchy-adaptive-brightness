@@ -8,18 +8,34 @@ read_conf
 mkdir -p "$(dirname "$CONF_FILE")"
 tmp=$(mktemp)
 {
-  echo "# ziouf.adaptive-brightness — bounds and calibration"
-  echo "MIN_BRIGHT=$1"
-  echo "MAX_BRIGHT=$2"
-  echo "CAM_BLACK=$CAM_BLACK"
-  echo "CAM_WHITE=$CAM_WHITE"
-  echo "INTERVAL=$INTERVAL"
-  echo "EMA_ALPHA=$EMA_ALPHA"
-  echo "DEADBAND=$DEADBAND"
-  echo "LUX_MAX=$LUX_MAX"
-  echo "EXPOSURE=$EXPOSURE"
+  cat <<EOF
+# ziouf.adaptive-brightness — bounds and calibration
+
+# Bornes appliquées par la boucle adaptative (%)
+MIN_BRIGHT=$1              # nuit / obscurité : plancher
+MAX_BRIGHT=$2              # plein jour : plafond
+
+# Calibration webcam (luminance moyenne 0..255, exposition verrouillée)
+# moyenne <= CAM_BLACK  -> MIN_BRIGHT
+# moyenne >= CAM_WHITE  -> MAX_BRIGHT (linéaire entre les deux)
+# Jour trop bas -> baisser CAM_WHITE ; nuit pas assez basse -> monter CAM_BLACK.
+CAM_BLACK=$CAM_BLACK
+CAM_WHITE=$CAM_WHITE
+
+# Boucle
+INTERVAL=$INTERVAL                # secondes entre deux mesures
+EMA_ALPHA=$EMA_ALPHA              # lissage 0..1 (plus haut = plus réactif)
+DEADBAND=$DEADBAND                 # ignore les variations < 3 % (anti-clignotement)
+
+# Capteur de lumière ambiante IIO (s'il existe, prioritaire sur la webcam)
+LUX_MAX=$LUX_MAX               # lux correspondant à MAX_BRIGHT
+
+# Webcam
+EXPOSURE=$EXPOSURE               # exposition manuelle en unités de 100 µs (25 ms)
+EOF
   [ -n "$CAM" ] && echo "CAM=$CAM"
   [ -n "$BACKLIGHT" ] && echo "BACKLIGHT=$BACKLIGHT"
+  true
 } > "$tmp"
 mv "$tmp" "$CONF_FILE"
 # apply immediately when the daemon is running (it would pick it up on the
