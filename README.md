@@ -48,7 +48,7 @@ history) or use `scripts/toggle` directly.
   two-handle slider (min/max). Keyboard: focus the brightness row, Enter
   switches which handle `h`/`l` edits.
 - Config: `~/.config/adaptive-brightness.conf`
-  (`MIN_BRIGHT`, `MAX_BRIGHT`, `GAIN`, `INTERVAL`, `EMA_ALPHA`, `DEADBAND`,
+  (`MIN_BRIGHT`, `MAX_BRIGHT`, `CAM_BLACK`, `CAM_WHITE`, `INTERVAL`, `EMA_ALPHA`, `DEADBAND`,
   `LUX_MAX`, `EXPOSURE`, `CAM`, `BACKLIGHT`). Re-read on every tick.
 - Diagnostics: `scripts/check` prints the detected sensor and backlight.
 
@@ -57,7 +57,7 @@ history) or use `scripts/toggle` directly.
 - Webcam mode briefly wakes the camera each interval (privacy light blinks).
   Increase `INTERVAL` if that bothers you.
 - HDMI/DP external backlights need DDC/CI (`ddcutil`) — not covered.
-- Very dark scenes with bright objects can read bright; tune `GAIN`.
+- Very dark scenes with bright objects can read bright; tune `CAM_WHITE` (raise it if too dim during the day, lower it if too bright).
 
 ## Tests
 

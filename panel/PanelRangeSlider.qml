@@ -89,8 +89,7 @@ Item {
       font.pixelSize: Style.font.caption
       font.bold: true
       anchors.horizontalCenter: parent.horizontalCenter
-      anchors.bottom: track.top
-      anchors.bottomMargin: Style.space(2)
+      y: track.y - height - Style.space(4)
     }
 
     Rectangle {
@@ -99,7 +98,7 @@ Item {
       radius: 1
       color: Color.accent
       anchors.horizontalCenter: parent.horizontalCenter
-      anchors.verticalCenter: track.verticalCenter
+      y: track.y - (height - track.height) / 2
     }
   }
 

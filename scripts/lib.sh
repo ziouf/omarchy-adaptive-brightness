@@ -8,7 +8,8 @@ STATE_DIR="${ADAPTIVE_BRIGHTNESS_STATE:-$HOME/.local/state/adaptive-brightness}"
 conf_defaults() {
   MIN_BRIGHT=10      # floor applied by the adaptive loop (%)
   MAX_BRIGHT=100     # ceiling applied by the adaptive loop (%)
-  GAIN=1.6           # webcam luminance multiplier (calibrate per camera)
+  CAM_BLACK=8        # webcam mean at/under which the screen goes to MIN_BRIGHT
+  CAM_WHITE=150      # webcam mean at/over which the screen goes to MAX_BRIGHT
   INTERVAL=15        # seconds between measurements in the loop
   EMA_ALPHA=0.3      # smoothing factor 0..1 (higher = more reactive)
   DEADBAND=3         # ignore changes smaller than this (%, anti-flicker)
@@ -54,10 +55,13 @@ map_lux() {
   }'
 }
 
-# map_webcam MEAN MIN MAX GAIN -> target % (mean 0..255 of a gray frame)
+# map_webcam MEAN MIN MAX BLACK WHITE -> target %
+# Black/white point calibration: mean <= BLACK maps to MIN (dark room at
+# night), mean >= WHITE maps to MAX (daylight). Linear in between. With the
+# exposure locked, mean is proportional to ambient light.
 map_webcam() {
-  awk -v m="$1" -v lo="$2" -v hi="$3" -v g="$4" 'BEGIN{
-    f = m * g / 255
+  awk -v m="$1" -v lo="$2" -v hi="$3" -v b="$4" -v w="$5" 'BEGIN{
+    f = (m - b) / (w - b)
     if (f < 0) f = 0; if (f > 1) f = 1
     printf "%d", lo + f * (hi - lo) + 0.5
   }'

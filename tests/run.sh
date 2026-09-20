@@ -30,10 +30,10 @@ t "map_lux ceil"   90 "$(map_lux 5000 10 90 5000)"
 mid=$(map_lux 70 10 90 5000)   # sqrt-ish midpoint of log curve
 [ "$mid" -gt 40 ] && [ "$mid" -lt 60 ] && ok "map_lux log mid=$mid" || bad "map_lux log mid=$mid"
 
-# map_webcam
-t "map_webcam 0"    10 "$(map_webcam 0 10 90 1.6)"
-t "map_webcam full" 90 "$(map_webcam 255 10 90 1.6)"
-t "map_webcam gain" 50 "$(map_webcam 125 10 90 1.02)"  # ~halfway
+# map_webcam (black/white point)
+t "map_webcam night"  10 "$(map_webcam 0 10 90 8 150)"    # below black -> min
+t "map_webcam day"    90 "$(map_webcam 222 10 90 8 150)"  # daylight -> max
+t "map_webcam half"   50 "$(map_webcam 79 10 90 8 150)"   # midpoint
 
 # ema
 t "ema first (no prev)" 42 "$(ema 42 "" 0.3)"

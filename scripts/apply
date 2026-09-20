@@ -14,7 +14,7 @@ elif cam=$(detect_cam); then
   ae=$(cam_lock_exposure "$cam") || true
   mean=$(cam_luminance "$cam") || exit 1
   cam_restore_exposure "$cam" "${ae:-}"
-  target=$(map_webcam "$mean" "$MIN_BRIGHT" "$MAX_BRIGHT" "$GAIN")
+  target=$(map_webcam "$mean" "$MIN_BRIGHT" "$MAX_BRIGHT" "$CAM_BLACK" "$CAM_WHITE")
 else
   echo "no ambient light sensor (IIO) and no working webcam" >&2
   exit 2
