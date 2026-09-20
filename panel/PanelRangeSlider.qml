@@ -100,22 +100,13 @@ Item {
       anchors.verticalCenter: track.verticalCenter
     }
 
-    Canvas {
-      width: Style.space(8)
-      height: Style.space(5)
+    Text {
+      textFormat: Text.PlainText
+      text: "\u25bc"
+      color: Color.accent
+      font.pixelSize: Style.font.caption
       anchors.horizontalCenter: parent.horizontalCenter
       anchors.top: levelText.bottom
-      onPaint: {
-        var c = getContext2D()
-        c.reset()
-        c.fillStyle = Color.accent
-        c.beginPath()
-        c.moveTo(0, 0)
-        c.lineTo(width, 0)
-        c.lineTo(width / 2, height)
-        c.closePath()
-        c.fill()
-      }
     }
   }
 
