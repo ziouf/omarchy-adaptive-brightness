@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# get-range — print "MIN MAX" for UIs.
+set -euo pipefail
+. "$(dirname "$0")/lib.sh"
+read_conf
+echo "$MIN_BRIGHT $MAX_BRIGHT"

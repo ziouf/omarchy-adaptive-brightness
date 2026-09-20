@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+# measure — print one ambient-light reading, normalized to 0..1000.
+# Priority: IIO ambient light sensor, then built-in webcam.
+# Exit 2 when no sensor is available.
+set -euo pipefail
+. "$(dirname "$0")/lib.sh"
+read_conf
+
+if als=$(detect_als); then
+  lux=$(cat "$als" 2>/dev/null) || exit 2
+  # normalize lux to 0..1000 on a log scale (10^3.5 ≈ LUX_MAX ceiling)
+  awk -v l="$lux" -v m="$LUX_MAX" 'BEGIN{
+    if (l < 1) l = 1
+    printf "%d", (log(l)/log(m)) * 1000
+  }'
+  exit 0
+fi
+
+if cam=$(detect_cam); then
+  ae=$(cam_lock_exposure "$cam") || true
+  mean=$(cam_luminance "$cam") || exit 2
+  cam_restore_exposure "$cam" "${ae:-}"
+  awk -v m="$mean" 'BEGIN{printf "%d", m * 1000 / 255}'
+  exit 0
+fi
+
+exit 2

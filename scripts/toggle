@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# toggle — start/stop the adaptive-brightness user service.
+set -euo pipefail
+if systemctl --user is-active --quiet adaptive-brightness; then
+  systemctl --user stop adaptive-brightness
+  notify-send -u low "Adaptive brightness" "Désactivé" 2>/dev/null || true
+  echo off
+else
+  "$(dirname "$0")/check" || exit 1
+  systemctl --user start adaptive-brightness
+  notify-send -u low "Adaptive brightness" "Activé" 2>/dev/null || true
+  echo on
+fi

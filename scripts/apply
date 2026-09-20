@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# apply — one measurement -> target % -> EMA -> deadband -> brightnessctl.
+set -euo pipefail
+. "$(dirname "$0")/lib.sh"
+read_conf
+mkdir -p "$STATE_DIR"
+
+valid_range "$MIN_BRIGHT" "$MAX_BRIGHT" || {
+  echo "bad range MIN_BRIGHT=$MIN_BRIGHT MAX_BRIGHT=$MAX_BRIGHT" >&2; exit 1; }
+
+if als=$(detect_als); then
+  target=$(map_lux "$(cat "$als")" "$MIN_BRIGHT" "$MAX_BRIGHT" "$LUX_MAX")
+elif cam=$(detect_cam); then
+  ae=$(cam_lock_exposure "$cam") || true
+  mean=$(cam_luminance "$cam") || exit 1
+  cam_restore_exposure "$cam" "${ae:-}"
+  target=$(map_webcam "$mean" "$MIN_BRIGHT" "$MAX_BRIGHT" "$GAIN")
+else
+  echo "no ambient light sensor (IIO) and no working webcam" >&2
+  exit 2
+fi
+
+target=$(clamp100 "$target")
+prev=$(cat "$STATE_DIR/ema" 2>/dev/null || true)
+smoothed=$(ema "$target" "$prev" "$EMA_ALPHA")
+echo "$smoothed" > "$STATE_DIR/ema"
+
+current=$(bl_pct || echo -1)
+delta=$(( smoothed > current ? smoothed - current : current - smoothed ))
+if (( delta >= DEADBAND )); then
+  bl_set "$smoothed"
+  echo "adaptive: ${current}% -> ${smoothed}% (target ${target}%)"
+else
+  echo "adaptive: hold ${current}% (target ${target}%, delta ${delta} < ${DEADBAND})"
+fi

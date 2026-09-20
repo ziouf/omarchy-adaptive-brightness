@@ -1,0 +1,12 @@
+[Unit]
+Description=ziouf adaptive brightness (ambient light -> backlight)
+
+[Service]
+Type=simple
+ExecStart=%h/.config/omarchy/plugins/ziouf.adaptive-brightness/scripts/loop
+Restart=on-failure
+RestartSec=10
+Nice=10
+
+[Install]
+WantedBy=default.target

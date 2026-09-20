@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "ziouf.adaptive-brightness",
+  "name": "Adaptive Brightness",
+  "version": "1.0.0",
+  "author": "ziouf",
+  "license": "MIT",
+  "description": "Adaptive screen brightness from ambient light: IIO light sensor when the machine has one, built-in webcam as fallback. Min/max bounds slider in the Display panel, toggle row, launcher entry, systemd user service.",
+  "kinds": [
+    "service"
+  ],
+  "entryPoints": {
+    "service": "Service.qml"
+  }
+}

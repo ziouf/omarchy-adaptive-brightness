@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# state — print "on|off MIN MAX" for panel UIs in one call.
+set -euo pipefail
+d="$(dirname "$0")"
+if systemctl --user is-active --quiet adaptive-brightness; then s=on; else s=off; fi
+echo "$s $($d/get-range)"

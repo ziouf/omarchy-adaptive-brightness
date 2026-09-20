@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# set-range MIN MAX — validate and persist the adaptive bounds.
+set -euo pipefail
+. "$(dirname "$0")/lib.sh"
+valid_range "${1:-}" "${2:-}" || {
+  echo "usage: set-range MIN MAX (integers 1..100, max-min >= 5)" >&2; exit 1; }
+read_conf
+mkdir -p "$(dirname "$CONF_FILE")"
+tmp=$(mktemp)
+{
+  echo "# ziouf.adaptive-brightness — bounds and calibration"
+  echo "MIN_BRIGHT=$1"
+  echo "MAX_BRIGHT=$2"
+  echo "GAIN=$GAIN"
+  echo "INTERVAL=$INTERVAL"
+  echo "EMA_ALPHA=$EMA_ALPHA"
+  echo "DEADBAND=$DEADBAND"
+  echo "LUX_MAX=$LUX_MAX"
+  echo "EXPOSURE=$EXPOSURE"
+  [ -n "$CAM" ] && echo "CAM=$CAM"
+  [ -n "$BACKLIGHT" ] && echo "BACKLIGHT=$BACKLIGHT"
+} > "$tmp"
+mv "$tmp" "$CONF_FILE"
+# apply immediately when the daemon is running (it would pick it up on the
+# next tick anyway; this makes the slider feel live)
+systemctl --user is-active --quiet adaptive-brightness && "$(dirname "$0")/apply" || true

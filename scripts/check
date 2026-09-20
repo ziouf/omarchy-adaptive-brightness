@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# check — verify a usable sensor and backlight exist; friendly errors only.
+set -euo pipefail
+. "$(dirname "$0")/lib.sh"
+read_conf
+
+if als=$(detect_als); then
+  echo "sensor: IIO ambient light ($als)"
+elif cam=$(detect_cam); then
+  echo "sensor: webcam $cam"
+else
+  echo "No ambient light sensor found: no IIO illuminance device and no /dev/video* capable of capture." >&2
+  echo "Adaptive brightness needs either an ALS sensor or a working webcam." >&2
+  exit 1
+fi
+
+bl_pct >/dev/null || {
+  echo "No controllable backlight (brightnessctl found no device)." >&2
+  exit 1
+}
+echo "backlight: ok ($(bl_pct)%)"

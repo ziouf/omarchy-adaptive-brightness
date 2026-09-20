@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+# status — exit 0 when the adaptive loop is running (menu `checked` hook).
+systemctl --user is-active --quiet adaptive-brightness

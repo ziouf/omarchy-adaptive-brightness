@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# loop — run apply every INTERVAL seconds (systemd service entrypoint).
+set -euo pipefail
+. "$(dirname "$0")/lib.sh"
+read_conf
+while :; do
+  "$(dirname "$0")/apply" || sleep 5
+  sleep "$INTERVAL"
+done
