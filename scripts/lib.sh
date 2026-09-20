@@ -11,7 +11,8 @@ conf_defaults() {
   CAM_BLACK=8        # webcam mean at/under which the screen goes to MIN_BRIGHT
   CAM_WHITE=150      # webcam mean at/over which the screen goes to MAX_BRIGHT
   INTERVAL=15        # seconds between measurements in the loop
-  EMA_ALPHA=0.3      # smoothing factor 0..1 (higher = more reactive)
+  EMA_ALPHA=0.3      # smoothing factor 0..1 when dimming
+  EMA_RISE=0.7       # smoothing factor 0..1 when brightening (faster)
   DEADBAND=3         # ignore changes smaller than this (%, anti-flicker)
   LUX_MAX=5000       # lux mapped to MAX_BRIGHT on the ALS curve
   EXPOSURE=250       # manual webcam exposure (100µs units) when locking AE

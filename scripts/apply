@@ -22,7 +22,13 @@ fi
 
 target=$(clamp100 "$target")
 prev=$(cat "$STATE_DIR/ema" 2>/dev/null || true)
-smoothed=$(ema "$target" "$prev" "$EMA_ALPHA")
+if (( target >= MAX_BRIGHT )); then
+  smoothed=$MAX_BRIGHT   # saturated scene (flashlight/daylight): full now
+elif [[ -n "$prev" ]] && (( target > prev )); then
+  smoothed=$(ema "$target" "$prev" "$EMA_RISE")   # brightening: react fast
+else
+  smoothed=$(ema "$target" "$prev" "$EMA_ALPHA")  # dimming: stay smooth
+fi
 echo "$smoothed" > "$STATE_DIR/ema"
 
 current=$(bl_pct || echo -1)

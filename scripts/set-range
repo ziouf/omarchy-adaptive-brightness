@@ -24,7 +24,8 @@ CAM_WHITE=$CAM_WHITE
 
 # Boucle
 INTERVAL=$INTERVAL                # secondes entre deux mesures
-EMA_ALPHA=$EMA_ALPHA              # lissage 0..1 (plus haut = plus réactif)
+EMA_ALPHA=$EMA_ALPHA              # lissage 0..1 a la baisse (doux)
+EMA_RISE=$EMA_RISE                # lissage 0..1 a la montee (reactif)
 DEADBAND=$DEADBAND                 # ignore les variations < 3 % (anti-clignotement)
 
 # Capteur de lumière ambiante IIO (s'il existe, prioritaire sur la webcam)
