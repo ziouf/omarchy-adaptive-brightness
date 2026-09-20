@@ -30,6 +30,11 @@ t "map_lux ceil"   90 "$(map_lux 5000 10 90 5000)"
 mid=$(map_lux 70 10 90 5000)   # sqrt-ish midpoint of log curve
 [ "$mid" -gt 40 ] && [ "$mid" -lt 60 ] && ok "map_lux log mid=$mid" || bad "map_lux log mid=$mid"
 
+# p90
+t "p90 basic" 90 "$(printf '%s\n' $(seq 1 100) | p90)"
+t "p90 one"   7  "$(printf '7\n' | p90)"
+t "p90 shadow" 100 "$(printf '0\n0\n0\n0\n0\n0\n0\n0\n0\n100\n' | p90)"
+
 # map_webcam (black/white point)
 t "map_webcam night"  10 "$(map_webcam 0 10 90 8 150)"    # below black -> min
 t "map_webcam day"    90 "$(map_webcam 222 10 90 8 150)"  # daylight -> max

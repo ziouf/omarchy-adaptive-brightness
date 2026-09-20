@@ -15,9 +15,9 @@ tmp=$(mktemp)
 MIN_BRIGHT=$1              # nuit / obscurité : plancher
 MAX_BRIGHT=$2              # plein jour : plafond
 
-# Calibration webcam (luminance moyenne 0..255, exposition verrouillée)
-# moyenne <= CAM_BLACK  -> MIN_BRIGHT
-# moyenne >= CAM_WHITE  -> MAX_BRIGHT (linéaire entre les deux)
+# Calibration webcam (percentile 90 de luminance 0..255, exposition verrouillée)
+# p90 <= CAM_BLACK  -> MIN_BRIGHT
+# p90 >= CAM_WHITE  -> MAX_BRIGHT (linéaire entre les deux)
 # Jour trop bas -> baisser CAM_WHITE ; nuit pas assez basse -> monter CAM_BLACK.
 CAM_BLACK=$CAM_BLACK
 CAM_WHITE=$CAM_WHITE

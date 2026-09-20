@@ -8,8 +8,8 @@ STATE_DIR="${ADAPTIVE_BRIGHTNESS_STATE:-$HOME/.local/state/adaptive-brightness}"
 conf_defaults() {
   MIN_BRIGHT=10      # floor applied by the adaptive loop (%)
   MAX_BRIGHT=100     # ceiling applied by the adaptive loop (%)
-  CAM_BLACK=8        # webcam mean at/under which the screen goes to MIN_BRIGHT
-  CAM_WHITE=150      # webcam mean at/over which the screen goes to MAX_BRIGHT
+  CAM_BLACK=10       # webcam p90 at/under which the screen goes to MIN_BRIGHT
+  CAM_WHITE=140      # webcam p90 at/over which the screen goes to MAX_BRIGHT
   INTERVAL=15        # seconds between measurements in the loop
   EMA_ALPHA=0.3      # smoothing factor 0..1 when dimming
   EMA_RISE=0.7       # smoothing factor 0..1 when brightening (faster)
@@ -56,10 +56,11 @@ map_lux() {
   }'
 }
 
-# map_webcam MEAN MIN MAX BLACK WHITE -> target %
-# Black/white point calibration: mean <= BLACK maps to MIN (dark room at
-# night), mean >= WHITE maps to MAX (daylight). Linear in between. With the
-# exposure locked, mean is proportional to ambient light.
+# map_webcam P90 MIN MAX BLACK WHITE -> target %
+# Black/white point calibration on the frame's p90 luminance: p90 <= BLACK
+# maps to MIN (dark room at night), p90 >= WHITE maps to MAX (daylight).
+# Linear in between. With the exposure locked, p90 is proportional to
+# ambient light and ignores shadowed pixels.
 map_webcam() {
   awk -v m="$1" -v lo="$2" -v hi="$3" -v b="$4" -v w="$5" 'BEGIN{
     f = (m - b) / (w - b)
@@ -117,12 +118,23 @@ cam_probe() {
   [ "$n" -ge 1 ]
 }
 
-# cam_luminance DEV -> mean gray 0..255 of one frame
+# p90 -> 90th percentile of whitespace-separated numbers on stdin. High
+# percentile ignores shadowed pixels (user's shadow, dark corners) and reads
+# the lit part of the scene = true ambient light.
+p90() {
+  sort -n | awk '{a[NR]=$1} END{
+    if (!NR) exit 1
+    i = int(NR * 0.9); if (i < NR * 0.9) i++   # nearest-rank ceil
+    if (i < 1) i = 1
+    printf "%d", a[i]
+  }'
+}
+
+# cam_luminance DEV -> p90 gray 0..255 of one frame (shadow-robust)
 cam_luminance() {
   ffmpeg -hide_banner -loglevel error -y -f v4l2 -i "$1" \
-    -frames:v 1 -vf "scale=16:9,format=gray" -f rawvideo - 2>/dev/null |
-    od -An -tu1 |
-    awk '{for(i=1;i<=NF;i++){s+=$i;n++}} END{if(!n) exit 1; printf "%.1f", s/n}'
+    -frames:v 1 -vf "scale=32:18,format=gray" -f rawvideo - 2>/dev/null |
+    od -An -tu1 | tr -s ' ' '\n' | grep -E '^[0-9]+$' | p90
 }
 
 # Lock manual exposure so auto-exposure does not normalize away the ambient
