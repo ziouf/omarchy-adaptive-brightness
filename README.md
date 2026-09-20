@@ -7,7 +7,8 @@ Sensor priority (maximum hardware compatibility):
 
 1. **IIO ambient light sensor** (`/sys/bus/iio/devices/*/in_illuminance_input`)
    — used automatically on machines that have one (lux, log-mapped).
-2. **Built-in webcam fallback** — one gray frame every interval, mean luminance.
+2. **Built-in webcam fallback** — one gray frame every interval, p90 pixel
+   luminance (robust to shadows crossing the lens).
    The camera's auto-exposure is locked before each capture (control names
    `auto_exposure`/`exposure_auto` both tried) so ambient light is not
    normalized away; machines whose camera refuses the lock still work, just
@@ -20,7 +21,7 @@ Backlight control via `brightnessctl` (works on Intel/AMD/ACPI backlight
 ## Install
 
 ```bash
-git clone https://github.com/<you>/omarchy-adaptive-brightness \
+git clone https://github.com/ziouf/omarchy-adaptive-brightness \
   ~/.config/omarchy/plugins/ziouf.adaptive-brightness
 ~/.config/omarchy/plugins/ziouf.adaptive-brightness/install-services.sh
 ```
@@ -58,6 +59,18 @@ history) or use `scripts/toggle` directly.
   Increase `INTERVAL` if that bothers you.
 - HDMI/DP external backlights need DDC/CI (`ddcutil`) — not covered.
 - Very dark scenes with bright objects can read bright; tune `CAM_WHITE` (raise it if too dim during the day, lower it if too bright).
+
+## Removal
+
+```bash
+~/.config/omarchy/plugins/ziouf.adaptive-brightness/uninstall-services.sh
+rm -rf ~/.config/omarchy/plugins/ziouf.adaptive-brightness
+rm -f ~/.config/adaptive-brightness.conf   # optional: keeps your calibration
+```
+
+If you installed the optional panel fork, remove it with
+`omarchy plugin remove cyril.monitor` (or restore the stock panel with
+`omarchy refresh shell`).
 
 ## Tests
 
