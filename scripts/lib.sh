@@ -131,8 +131,9 @@ p90() {
 }
 
 # cam_luminance DEV -> p90 gray 0..255 of one frame (shadow-robust)
+# timeout: a camera still resuming after suspend can hang ffmpeg forever.
 cam_luminance() {
-  ffmpeg -hide_banner -loglevel error -y -f v4l2 -i "$1" \
+  timeout 10 ffmpeg -hide_banner -loglevel error -y -f v4l2 -i "$1" \
     -frames:v 1 -vf "scale=32:18,format=gray" -f rawvideo - 2>/dev/null |
     od -An -tu1 | tr -s ' ' '\n' | grep -E '^[0-9]+$' | p90
 }
@@ -145,8 +146,8 @@ cam_lock_exposure() {
   command -v v4l2-ctl >/dev/null || return 0
   local dev=$1 name
   for name in auto_exposure exposure_auto; do
-    if v4l2-ctl -d "$dev" -c "$name=1" 2>/dev/null; then
-      v4l2-ctl -d "$dev" -c exposure_time_absolute="$EXPOSURE" 2>/dev/null
+    if timeout 5 v4l2-ctl -d "$dev" -c "$name=1" 2>/dev/null; then
+      timeout 5 v4l2-ctl -d "$dev" -c exposure_time_absolute="$EXPOSURE" 2>/dev/null
       echo "$name"
       return 0
     fi
@@ -157,7 +158,7 @@ cam_lock_exposure() {
 cam_restore_exposure() {
   command -v v4l2-ctl >/dev/null || return 0
   local dev=$1 name=$2
-  [ -n "$name" ] && v4l2-ctl -d "$dev" -c "$name=3" 2>/dev/null
+  [ -n "$name" ] && timeout 5 v4l2-ctl -d "$dev" -c "$name=3" 2>/dev/null
 }
 
 # ---- backlight -----------------------------------------------------------
